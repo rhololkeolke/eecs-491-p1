@@ -11,7 +11,7 @@ public interface BaseAction {
 	
 	public int getDuration();
 	
-	public void updateDuration(int duration);
+	public void updateDuration(int duration) throws Exception;
 	
 	public Action getAction();
 

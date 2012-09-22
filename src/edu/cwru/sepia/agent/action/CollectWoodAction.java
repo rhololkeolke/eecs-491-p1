@@ -8,6 +8,10 @@ public final class CollectWoodAction implements BaseAction {
 	private final static Condition pre = new Condition(0,0,1,0);
 	private final static Condition post = new Condition(0,100,1,0);
 	
+	// set to a default value, but this should probably be changed to a 
+	// more reasonable estimate
+	private static int duration = 10;
+	
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -20,8 +24,7 @@ public final class CollectWoodAction implements BaseAction {
 
 	@Override
 	public int getDuration() {
-		// TODO Auto-generated method stub
-		return 0;
+		return duration;
 	}
 
 	@Override
@@ -31,8 +34,11 @@ public final class CollectWoodAction implements BaseAction {
 	}
 
 	@Override
-	public void updateDuration(int duration) {
-		// TODO Auto-generated method stub
+	public void updateDuration(int duration) throws Exception{
+		if(duration > 0)
+			CollectWoodAction.duration = duration;
+		else
+			throw new Exception("Duration out of bounds!!");
 	}
 	
 }
