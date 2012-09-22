@@ -8,11 +8,16 @@ import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.environment.model.history.History.HistoryView;
 import edu.cwru.sepia.environment.model.state.State.StateView;
 
-public class ResourceCollector extends Agent {
+/*
+ * This agent uses an instance of the SRS class to do online planning for 
+ * resource collection.
+ */
+
+public class ResourceCollectionAgent extends Agent {
 
 	private static final long serialVersionUID = 1596635469778909387L;
 
-	public ResourceCollector(int playernum) {
+	public ResourceCollectionAgent(int playernum) {
 		super(playernum);
 		// TODO Auto-generated constructor stub
 	}
