@@ -1,12 +1,27 @@
 package edu.cwru.sepia.agent.action;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.agent.Condition;
 
-public final class BuildFarmAction extends BaseAction {
+public class BuildFarmAction implements BaseAction {
+	
+	private final static Condition pre = new Condition(500,250,1,0);
+	private final static Condition post = new Condition(0,0,1,4);
 
-	private BuildFarmAction()
-	{
-		throw new AssertionError();
+	@Override
+	public Condition getPreConditions() {
+		return pre;
+	}
+
+	@Override
+	public Condition getPostConditions() {
+		return post;
+	}
+
+	@Override
+	public int getDuration() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
@@ -14,4 +29,11 @@ public final class BuildFarmAction extends BaseAction {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void updateDuration(int duration) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1,12 +1,27 @@
 package edu.cwru.sepia.agent.action;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.agent.Condition;
 
-public final class CollectWoodAction extends CollectionAction {
+public final class CollectWoodAction implements BaseAction {
 
-	private CollectWoodAction()
-	{
-		throw new AssertionError();
+	private final static Condition pre = new Condition(0,0,1,0);
+	private final static Condition post = new Condition(0,100,1,0);
+	
+	@Override
+	public Condition getPreConditions() {
+		return pre;
+	}
+
+	@Override
+	public Condition getPostConditions() {
+		return post;
+	}
+
+	@Override
+	public int getDuration() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
@@ -14,4 +29,10 @@ public final class CollectWoodAction extends CollectionAction {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void updateDuration(int duration) {
+		// TODO Auto-generated method stub
+	}
+	
 }
