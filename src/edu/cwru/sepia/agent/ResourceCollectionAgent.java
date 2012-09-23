@@ -37,7 +37,7 @@ public class ResourceCollectionAgent extends Agent {
 	private List<BaseAction> plan = null;
 	
 	// this number controls how often the agent will replan
-	private int replanTime = 10;
+	private int replanTime = 200;
 	
 	private Condition goal;
 	
@@ -56,11 +56,12 @@ public class ResourceCollectionAgent extends Agent {
 
 	public ResourceCollectionAgent(int playernum) {
 		super(playernum);
-		planner = new SRS(this.playernum);
 		
 		// Extract the Goal conditions from the xml
 		//Preferences prefs = Preferences.userRoot().node("edu").node("cwru").node("sepia").node("ModelParameters");
 		goal = new Condition();
+		goal.gold=1000;
+		goal.wood=1000;
 		
 		// this will be used by the convertId's method
 		inProgress = new ArrayList<Pair<BaseAction, Integer>>();
@@ -72,10 +73,6 @@ public class ResourceCollectionAgent extends Agent {
 	public Map<Integer, Action> initialStep(StateView newstate,
 			HistoryView statehistory) {
 		System.out.println("In initial step");
-		// get initial plan
-		plan = SRS.getPlan(newstate, statehistory, goal);
-		
-		System.out.println("# of actions in plan: " + plan.size());
 		
 		// find out the townhall and add all of the peasants to the free list
 		List<Integer> unitIds = newstate.getUnitIds(this.playernum);
@@ -112,6 +109,10 @@ public class ResourceCollectionAgent extends Agent {
 			}
 		}
 
+		// get initial plan
+		plan = SRS.getPlan(newstate, goal, this.playernum);
+		System.out.println("# of actions in plan: " + plan.size());
+		
 		// increment the number of steps;
 		Map<Integer, Action> executableActions = convertPlan2Actions(newstate, new HashMap<Integer, Action>());
 		System.out.println("executableActions: " + executableActions);
@@ -126,7 +127,7 @@ public class ResourceCollectionAgent extends Agent {
 		System.out.println("\n");
 		if(newstate.getTurnNumber() % replanTime == 0)
 		{
-			plan = SRS.getPlan(newstate, statehistory, goal);
+			plan = SRS.getPlan(newstate, goal, this.playernum);
 		}
 
 		Map<Integer, ActionResult> commandLog = statehistory.getCommandFeedback(playernum, newstate.getTurnNumber()-1);

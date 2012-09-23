@@ -24,10 +24,15 @@ import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 public class MEA 
 {
 
-	public static List<BaseAction> plan(StateView state, Condition goal, int playerNum)
+	public static List<BaseAction> plan(Condition start, Condition goal)
 	{
 		List<BaseAction> actions = new LinkedList<BaseAction>();
-		Condition current = getCurrentCondition(state, playerNum);
+		Condition current = new Condition();
+		current.gold = start.gold;
+		current.peasant = start.peasant;
+		current.supply = start.supply;
+		current.townhall = start.townhall;
+		current.wood = start.wood;
 		
 		while(true)
 		{
@@ -159,53 +164,5 @@ public class MEA
 		}
 		
 		return actions;
-	}
-	
-	private static Condition getCurrentCondition(StateView state, int playerNum)
-	{
-		Condition current = new Condition();
-		
-		current.gold = state.getResourceAmount(playerNum, ResourceType.GOLD);
-		current.wood = state.getResourceAmount(playerNum, ResourceType.WOOD);
-		
-		
-		List<UnitView> units = state.getUnits(playerNum);
-		for (UnitView unit: units)
-		{
-			if (unit.getTemplateView().getName().equalsIgnoreCase("peasant"))
-			{
-				current.peasant += 1;
-				Action act = unit.getCurrentDurativeAction();
-				if (act != null)
-				{
-					if (act.getType() == ActionType.COMPOUNDGATHER)
-					{
-						TargetedAction targetAct = (TargetedAction) act;
-						if (state.getResourceNode(targetAct.getTargetId()).getType() == Type.GOLD_MINE)
-						{
-							current.gold += 100;
-						}
-						else if (state.getResourceNode(targetAct.getTargetId()).getType() == Type.TREE)
-						{
-							current.wood += 100;
-						}
-					}
-					else if (act.getType() == ActionType.COMPOUNDBUILD)
-					{
-						current.supply += 4;
-					}
-				}
-			}
-			else if (unit.getTemplateView().getName().equalsIgnoreCase("townhall"))
-			{
-				current.supply += 1;
-			}
-			else if (unit.getTemplateView().getName().equalsIgnoreCase("farm"))
-			{
-				current.supply += 4;
-			}
-				
-		}
-		return current;
 	}
 }
