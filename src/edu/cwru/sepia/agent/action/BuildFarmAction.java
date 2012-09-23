@@ -13,8 +13,8 @@ public class BuildFarmAction implements BaseAction {
 
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate
-	private static int duration = 10;
-	
+	private static int duration = 1;
+		
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -66,5 +66,10 @@ public class BuildFarmAction implements BaseAction {
 	public void setEndTime(int time)
 	{
 		endTime = time;
+	}
+
+	@Override
+	public String getUnitType() {
+		return "TownHall";
 	}
 }

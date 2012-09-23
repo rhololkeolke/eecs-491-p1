@@ -23,4 +23,6 @@ public interface BaseAction {
 	
 	public void setEndTime(int time);
 
+	public String getUnitType();
+
 }

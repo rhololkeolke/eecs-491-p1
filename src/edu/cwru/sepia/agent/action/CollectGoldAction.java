@@ -14,7 +14,7 @@ public final class CollectGoldAction implements BaseAction {
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate
 	private static int duration = 10;
-	
+		
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -66,5 +66,9 @@ public final class CollectGoldAction implements BaseAction {
 	public void setEndTime(int time)
 	{
 		endTime = time;
+	}
+
+	public String getUnitType() {
+		return "Peasant";
 	}
 }
