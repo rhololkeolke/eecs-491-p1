@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.Map;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.action.BaseAction;
-import edu.cwru.sepia.agent.action.CollectAction;
 import edu.cwru.sepia.agent.action.CollectGoldAction;
 import edu.cwru.sepia.agent.action.CollectWoodAction;
 import edu.cwru.sepia.environment.model.history.History.HistoryView;
@@ -39,7 +39,7 @@ public class ResourceCollectionAgent extends Agent {
 	 * The first key is the list the action came from
 	 * The second key is the total duration so far of that action
 	 */
-	private Map<Integer, BaseAction> inProgress;
+	private List<Pair<BaseAction,Integer>> inProgress;
 	
 	// stores the townhall's id
 	private Integer townhall = null;
@@ -56,7 +56,7 @@ public class ResourceCollectionAgent extends Agent {
 		goal = new Condition();
 		
 		// this will be used by the convertId's method
-		inProgress = new HashMap<Integer, BaseAction>();
+		inProgress = new ArrayList<Pair<BaseAction, Integer>>();
 		
 		freePeasants = new LinkedList<Integer>();
 	}
@@ -159,13 +159,24 @@ public class ResourceCollectionAgent extends Agent {
 				System.out.println("\tUnit Type: " + plan.get(0).getUnitType());
 				if(plan.get(0).getUnitType().equals("Peasant"))
 				{
+					// grab the id of the peasant this will be assigned to
 					Integer id = getAvailPeasant();
-					actionMap.put(id, plan.remove(0).getAction(playernum, id, state));
+					// remove this action from the plan
+					BaseAction action = plan.remove(0);
+					// set the unitID in the action
+					action.setUnitId(id);
+					// add the action to the actions to be executed this turn
+					actionMap.put(id, action.getAction(playernum, state));
+					// add the action to the list of actions in progress
+					inProgress.add(new Pair<BaseAction, Integer>(action, 0));
 					System.out.println("actionMap: " + actionMap);
 				}
 				else
 				{
-					actionMap.put(townhall, plan.remove(0).getAction(playernum, townhall, state));
+					BaseAction action = plan.remove(0);
+					action.setUnitId(townhall);
+					actionMap.put(townhall, action.getAction(playernum, state));
+					inProgress.add(new Pair<BaseAction, Integer>(action, 0));
 					System.out.println("actionMap: " + actionMap);
 				}
 			}

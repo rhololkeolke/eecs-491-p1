@@ -16,6 +16,8 @@ public final class BuildPeasantAction implements BaseAction {
 	// more reasonable estimate
 
 	private static int duration = 1;
+	
+	private int unitid;
 
 	@Override
 	public Condition getPreConditions() {
@@ -33,7 +35,7 @@ public final class BuildPeasantAction implements BaseAction {
 	}
 
 	@Override
-	public Action getAction(int playernum, int unitid, StateView state) {
+	public Action getAction(int playernum, StateView state) {
 		int templateID = state.getTemplate(playernum, "Peasant").getID();
 		return Action.createCompoundProduction(unitid, templateID);
 	}
@@ -72,5 +74,20 @@ public final class BuildPeasantAction implements BaseAction {
 
 	public String getUnitType() {
 		return "TownHall";
+	}
+
+	@Override
+	public void setUnitId(int unitid) {
+		this.unitid = unitid;
+	}
+
+	@Override
+	public int getUnitId() {
+		return unitid;
+	}
+	
+	@Override
+	public String toString(){
+		return "Build a Peasant with " + unitid;
 	}
 }

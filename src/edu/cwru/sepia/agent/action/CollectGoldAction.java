@@ -18,12 +18,10 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 	// Keeps track of duration per mine
 	private static Map<Integer, Integer> durations = new HashMap<Integer, Integer>();
 	
-	// This is this instances duration and the associated resource ID
-	private int duration = 0;
-	private int resourceID;
-	
 	private static Integer shortestDuration = null;
 	private static Integer shortestID = null;
+	
+	int unitid;
 	
 	@Override
 	public Condition getPreConditions() {
@@ -41,7 +39,7 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 	}
 	
 	@Override
-	public Action getAction(int playernum, int unitid, StateView state) {
+	public Action getAction(int playernum, StateView state) {
 		return Action.createCompoundGather(unitid, shortestID);
 	}
 
@@ -51,14 +49,7 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 		if(duration > 0)
 		{
 			// update the action's resource ID with a new duration
-			durations.put(resourceID, duration);
-			
-			// if this new duration is the shortest
-			if(shortestDuration == null || duration < shortestDuration)
-			{
-				shortestDuration = duration;
-				shortestID = resourceID;
-			}
+			durations.put(shortestID, duration);
 		}
 		else
 			throw new Exception("Duration out of bounds!!");
@@ -118,5 +109,20 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void setUnitId(int unitid) {
+		this.unitid = unitid;
+	}
+
+	@Override
+	public int getUnitId() {
+		return unitid;
+	}
+	
+	@Override
+	public String toString(){
+		return "Collect Gold with " + unitid;
 	}
 }

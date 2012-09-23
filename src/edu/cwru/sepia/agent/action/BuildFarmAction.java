@@ -19,6 +19,8 @@ public class BuildFarmAction implements BaseAction {
 	// more reasonable estimate
 
 	private static int duration = 1;
+	
+	int unitid;
 
 	@Override
 	public Condition getPreConditions() {
@@ -36,7 +38,7 @@ public class BuildFarmAction implements BaseAction {
 	}
 
 	@Override
-	public Action getAction(int playernum, int unitid, StateView state) {
+	public Action getAction(int playernum, StateView state) {
 		UnitView unit = state.getUnit(unitid);
 		int[] space = state.getClosestOpenPosition(unit.getXPosition(), unit.getYPosition());
 		int templateID = state.getTemplate(playernum, "Farm").getID();
@@ -78,5 +80,20 @@ public class BuildFarmAction implements BaseAction {
 	@Override
 	public String getUnitType() {
 		return "TownHall";
+	}
+	
+	@Override
+	public String toString(){
+		return "Build a Farm with " + unitid;
+	}
+
+	@Override
+	public void setUnitId(int unitid) {
+		this.unitid = unitid;
+	}
+
+	@Override
+	public int getUnitId() {
+		return unitid;
 	}
 }

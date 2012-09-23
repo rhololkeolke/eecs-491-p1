@@ -21,9 +21,7 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 	private static Integer shortestDuration = null;
 	private static Integer shortestID = null;
 	
-	// This is this instances duration and the associated resource ID
-	private int duration = 0;
-	private int resourceID;
+	private int unitid;
 
 	@Override
 	public Condition getPreConditions() {
@@ -41,8 +39,8 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 	}
 	
 	@Override
-	public Action getAction(int playernum, int unitid, StateView state) {
-		return Action.createCompoundGather(unitid, resourceID);
+	public Action getAction(int playernum, StateView state) {
+		return Action.createCompoundGather(unitid, shortestID);
 	}
 
 	@Override
@@ -51,14 +49,7 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 		if(duration > 0)
 		{
 			// update the action's resource ID with a new duration
-			durations.put(resourceID, duration);
-			
-			// if this new duration is the shortest
-			if(shortestDuration == null || duration < shortestDuration)
-			{
-				shortestDuration = duration;
-				shortestID = resourceID;
-			}
+			durations.put(shortestID, duration);
 		}
 		else
 			throw new Exception("Duration out of bounds!!");
@@ -95,7 +86,7 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 
 	@Override
 	public void addResource(int resourceId, int distance) {
-		durations.put(resourceID, 2*distance);
+		durations.put(resourceId, 2*distance);
 		if(shortestDuration == null || 2*distance < shortestDuration)
 		{
 			shortestDuration = 2*distance;
@@ -121,4 +112,18 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 		}
 	}
 
+	@Override
+	public void setUnitId(int unitid) {
+		this.unitid = unitid;
+	}
+
+	@Override
+	public int getUnitId() {
+		return unitid;
+	}
+	
+	@Override
+	public String toString(){
+		return "Collect Wood with " + unitid;
+	}
 }

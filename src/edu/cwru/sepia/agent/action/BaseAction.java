@@ -14,7 +14,7 @@ public interface BaseAction {
 	
 	public void updateDuration(int duration) throws Exception;
 	
-	public Action getAction(int playernum, int unitid, StateView state);
+	public Action getAction(int playernum, StateView state);
 	
 	public int getStartTime();
 	
@@ -25,5 +25,9 @@ public interface BaseAction {
 	public void setEndTime(int time);
 
 	public String getUnitType();
+	
+	public void setUnitId(int unitid);
+	
+	public int getUnitId();
 
 }
