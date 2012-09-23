@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionFeedback;
+import edu.cwru.sepia.action.ActionResult;
+import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.agent.action.BaseAction;
 import edu.cwru.sepia.agent.action.CollectGoldAction;
 import edu.cwru.sepia.agent.action.CollectWoodAction;
+import edu.cwru.sepia.environment.model.history.BirthLog;
 import edu.cwru.sepia.environment.model.history.History.HistoryView;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
@@ -43,6 +47,7 @@ public class ResourceCollectionAgent extends Agent {
 	
 	// stores the townhall's id
 	private Integer townhall = null;
+	private boolean busyTownhall = false;
 	
 	// stores the peasants that are available for work
 	private List<Integer> freePeasants;
@@ -106,7 +111,9 @@ public class ResourceCollectionAgent extends Agent {
 		}
 
 		// increment the number of steps;
-		return convertPlan2Actions(newstate);
+		Map<Integer, Action> executableActions = convertPlan2Actions(newstate, new HashMap<Integer, Action>());
+		System.out.println("executableActions: " + executableActions);
+		return executableActions;
 	}
 
 	@Override
@@ -119,8 +126,23 @@ public class ResourceCollectionAgent extends Agent {
 		{
 			plan = SRS.getPlan(newstate, statehistory, goal);
 		}
+
+		Map<Integer, ActionResult> commandLog = statehistory.getCommandFeedback(playernum, newstate.getTurnNumber()-1);
+		System.out.println("commandLog: " + commandLog);
+
 		
-		return convertPlan2Actions(newstate);
+		Map<Integer, Action> executableActions = updateDurations(commandLog);
+		
+		List<BirthLog> births = statehistory.getBirthLogs(newstate.getTurnNumber()-1);
+		System.out.println("births: " + births);
+		System.out.println("");
+		System.out.println("");
+		addNewPeasants(births);
+		
+		executableActions = convertPlan2Actions(newstate, executableActions);
+		
+		System.out.println("executableActions: " + executableActions);
+		return executableActions;
 	}
 
 	@Override
@@ -145,10 +167,9 @@ public class ResourceCollectionAgent extends Agent {
 	 * This method takes the plan from the SRS and converts it to
 	 * SEPIA's actions
 	 */
-	private Map<Integer, Action> convertPlan2Actions(StateView state)
+	private Map<Integer, Action> convertPlan2Actions(StateView state, Map<Integer, Action> actionMap)
 	{
 		System.out.println("In convertPlan2Actions");
-		Map<Integer, Action> actionMap = new HashMap<Integer, Action>();
 
 		while(!plan.isEmpty())
 		{
@@ -177,6 +198,7 @@ public class ResourceCollectionAgent extends Agent {
 					action.setUnitId(townhall);
 					actionMap.put(townhall, action.getAction(playernum, state));
 					inProgress.add(new Pair<BaseAction, Integer>(action, 0));
+					busyTownhall = true;
 					System.out.println("actionMap: " + actionMap);
 				}
 			}
@@ -197,6 +219,8 @@ public class ResourceCollectionAgent extends Agent {
 		result = result && (freePeasants.size() >= pre.peasant); // are there enough peasants?
 		// might have to subtract the number of peasants currently created
 		result = result && (state.getSupplyCap(playernum) >= pre.supply); // are there enough farms?
+		if(pre.townhall == 1)
+			result = result && !busyTownhall;
 		return result;
 	}
 	
@@ -205,5 +229,65 @@ public class ResourceCollectionAgent extends Agent {
 		if(!freePeasants.isEmpty())
 			return freePeasants.remove(0);
 		return null;
+	}
+	
+	/*
+	 * This method will either update the duration counter for actions in progress
+	 * It will also remove an action from inProgress and free up its resources if
+	 * the action is incomplete
+	 */
+	private Map<Integer, Action> updateDurations(Map<Integer, ActionResult> log)
+	{
+		Map<Integer, Action> actionMap = new HashMap<Integer, Action>();
+		int index = -1;
+		List<Pair<BaseAction, Integer>> newInProgress = new ArrayList<Pair<BaseAction, Integer>>(); 
+		for(Pair<BaseAction, Integer> pairing : inProgress)
+		{
+			index++;
+			int unitid = pairing.first.getUnitId();
+			ActionFeedback result = log.get(unitid).getFeedback();
+			// if still in progress
+			if(result.compareTo(ActionFeedback.INCOMPLETE) == 0)
+			{
+				pairing.second++;
+				newInProgress.add(pairing);
+			}
+			// finished last turn
+			else if(result.compareTo(ActionFeedback.COMPLETED) == 0)
+			{
+				// update the duration for that resourceID
+				pairing.second++;
+				// don't want to remove collection actions because they need to be continued
+				// with a COMPOUND_DEPOSIT move
+				if(log.get(unitid).getAction().getType().compareTo(ActionType.COMPOUNDGATHER) == 0)
+				{
+					actionMap.put(unitid, Action.createCompoundDeposit(unitid, townhall));
+					newInProgress.add(pairing);
+					continue;
+				}
+				try {
+					pairing.first.updateDuration(pairing.second);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				// remove the object from the inProgress list
+				Pair<BaseAction, Integer> completed = inProgress.get(index);
+				if(unitid != townhall)
+					freePeasants.add(unitid);
+				else
+					busyTownhall = false;
+			}
+		}
+		inProgress = newInProgress;
+		return actionMap;
+	}
+	
+	private void addNewPeasants(List<BirthLog> births)
+	{
+		for(BirthLog log : births)
+		{
+			freePeasants.add(log.getNewUnitID());
+		}
 	}
 }

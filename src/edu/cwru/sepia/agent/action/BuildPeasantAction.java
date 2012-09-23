@@ -9,8 +9,8 @@ public final class BuildPeasantAction implements BaseAction {
 	private int startTime;
 	private int endTime;
 	
-	private final static Condition pre = new Condition(400,0,0,1);
-	private final static Condition post = new Condition(0,0,1,0);
+	private final static Condition pre = new Condition(400,0,0,1,1);
+	private final static Condition post = new Condition(0,0,1,0,1);
 	
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate

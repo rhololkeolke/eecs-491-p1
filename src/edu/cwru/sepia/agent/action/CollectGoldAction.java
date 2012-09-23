@@ -12,8 +12,8 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 	private int startTime;
 	private int endTime;
 	
-	private final static Condition pre = new Condition(0,0,1,0);
-	private final static Condition post = new Condition(100,0,1,0);
+	private final static Condition pre = new Condition(0,0,1,0,0);
+	private final static Condition post = new Condition(100,0,1,0,0);
 	
 	// Keeps track of duration per mine
 	private static Map<Integer, Integer> durations = new HashMap<Integer, Integer>();

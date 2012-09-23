@@ -12,8 +12,8 @@ public class BuildFarmAction implements BaseAction {
 	private int startTime;
 	private int endTime;
 	
-	private final static Condition pre = new Condition(500,250,1,0);
-	private final static Condition post = new Condition(0,0,1,4);
+	private final static Condition pre = new Condition(500,250,1,0,1);
+	private final static Condition post = new Condition(0,0,1,4,1);
 
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate
