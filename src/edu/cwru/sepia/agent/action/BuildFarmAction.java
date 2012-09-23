@@ -10,11 +10,9 @@ public class BuildFarmAction implements BaseAction {
 
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate
-	private static int duration = 10;
-	
-	// used to keep track of which peasant is executing this action
-	private Integer peasant = null;
-	
+
+	private static int duration = 1;
+
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -45,13 +43,8 @@ public class BuildFarmAction implements BaseAction {
 	}
 
 	@Override
-	public void setPeasant(Integer i) {
-		peasant = i;
-	}
-	
-	@Override
-	public Integer getPeasant(){
-		return peasant;
+	public String getUnitType() {
+		return "TownHall";
 	}
 
 }

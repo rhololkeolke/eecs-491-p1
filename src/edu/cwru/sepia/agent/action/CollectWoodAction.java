@@ -11,9 +11,7 @@ public final class CollectWoodAction implements BaseAction {
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate
 	private static int duration = 10;
-	
-	private Integer peasant = null;
-	
+
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -42,14 +40,10 @@ public final class CollectWoodAction implements BaseAction {
 		else
 			throw new Exception("Duration out of bounds!!");
 	}
-	
+
 	@Override
-	public void setPeasant(Integer i) {
-		peasant = i;
+	public String getUnitType() {
+		return "Peasant";
 	}
 	
-	@Override
-	public Integer getPeasant(){
-		return peasant;
-	}
 }

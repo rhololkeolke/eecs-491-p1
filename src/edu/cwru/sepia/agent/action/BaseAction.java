@@ -15,7 +15,6 @@ public interface BaseAction {
 	
 	public Action getAction();
 	
-	public void setPeasant(Integer i);
-	
-	public Integer getPeasant();
+	public String getUnitType();
+
 }
