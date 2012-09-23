@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent.action;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.Condition;
+import edu.cwru.sepia.environment.model.state.State.StateView;
 
 public interface BaseAction {
 	
@@ -13,7 +14,7 @@ public interface BaseAction {
 	
 	public void updateDuration(int duration) throws Exception;
 	
-	public Action getAction();
+	public Action getAction(int playernum, int unitid, StateView state);
 	
 	public int getStartTime();
 	

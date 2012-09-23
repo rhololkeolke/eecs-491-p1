@@ -1,7 +1,11 @@
 package edu.cwru.sepia.agent.action;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.agent.Condition;
+import edu.cwru.sepia.environment.model.state.State.StateView;
+import edu.cwru.sepia.environment.model.state.Template.TemplateView;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
 public class BuildFarmAction implements BaseAction {
 	
@@ -32,9 +36,11 @@ public class BuildFarmAction implements BaseAction {
 	}
 
 	@Override
-	public Action getAction() {
-		// TODO Auto-generated method stub
-		return null;
+	public Action getAction(int playernum, int unitid, StateView state) {
+		UnitView unit = state.getUnit(unitid);
+		int[] space = state.getClosestOpenPosition(unit.getXPosition(), unit.getYPosition());
+		int templateID = state.getTemplate(playernum, "Farm").getID();
+		return Action.createCompoundBuild(unitid, templateID, space[0], space[1]);
 	}
 
 	@Override

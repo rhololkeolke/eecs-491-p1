@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent.action;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.Condition;
+import edu.cwru.sepia.environment.model.state.State.StateView;
 
 public final class BuildPeasantAction implements BaseAction {
 	
@@ -32,9 +33,9 @@ public final class BuildPeasantAction implements BaseAction {
 	}
 
 	@Override
-	public Action getAction() {
-		// TODO Auto-generated method stub
-		return null;
+	public Action getAction(int playernum, int unitid, StateView state) {
+		int templateID = state.getTemplate(playernum, "Peasant").getID();
+		return Action.createCompoundProduction(unitid, templateID);
 	}
 
 	@Override

@@ -9,7 +9,12 @@ import java.util.Map;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.action.BaseAction;
+import edu.cwru.sepia.agent.action.CollectAction;
+import edu.cwru.sepia.agent.action.CollectGoldAction;
+import edu.cwru.sepia.agent.action.CollectWoodAction;
 import edu.cwru.sepia.environment.model.history.History.HistoryView;
+import edu.cwru.sepia.environment.model.state.ResourceNode;
+import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State.StateView;
 
@@ -23,10 +28,10 @@ public class ResourceCollectionAgent extends Agent {
 	private static final long serialVersionUID = 1596635469778909387L;
 	
 	private SRS planner;
-	private Map<Integer, List<BaseAction>> plan = null;
+	private List<BaseAction> plan = null;
 	
 	// this number controls how often the agent will replan
-	private int replanTime = 5;
+	private int replanTime = 10;
 	
 	private Condition goal;
 	
@@ -34,7 +39,7 @@ public class ResourceCollectionAgent extends Agent {
 	 * The first key is the list the action came from
 	 * The second key is the total duration so far of that action
 	 */
-	private Map<Integer, Integer> inProgress;
+	private Map<Integer, BaseAction> inProgress;
 	
 	// stores the townhall's id
 	private Integer townhall = null;
@@ -45,11 +50,13 @@ public class ResourceCollectionAgent extends Agent {
 	public ResourceCollectionAgent(int playernum) {
 		super(playernum);
 		planner = new SRS(this.playernum);
+		
 		// Extract the Goal conditions from the xml
 		//Preferences prefs = Preferences.userRoot().node("edu").node("cwru").node("sepia").node("ModelParameters");
 		goal = new Condition();
+		
 		// this will be used by the convertId's method
-		inProgress = new HashMap<Integer, Integer>();
+		inProgress = new HashMap<Integer, BaseAction>();
 		
 		freePeasants = new LinkedList<Integer>();
 	}
@@ -61,7 +68,7 @@ public class ResourceCollectionAgent extends Agent {
 		// get initial plan
 		plan = SRS.getPlan(newstate, statehistory, goal);
 		
-		System.out.println("# of lists in plan: " + plan.size());
+		System.out.println("# of actions in plan: " + plan.size());
 		
 		// find out the townhall and add all of the peasants to the free list
 		List<Integer> unitIds = newstate.getUnitIds(this.playernum);
@@ -77,6 +84,26 @@ public class ResourceCollectionAgent extends Agent {
 				freePeasants.add(id);
 			}
 		}
+		
+		// add the resources to the Collect Actions
+		int[] spaces = new int[2];
+		spaces[0] = newstate.getUnit(townhall).getXPosition();
+		spaces[1] = newstate.getUnit(townhall).getYPosition();
+		CollectGoldAction goldAction = new CollectGoldAction();
+		CollectWoodAction woodAction = new CollectWoodAction();
+		List<Integer> resourceIds = newstate.getAllResourceIds();
+		for(Integer id : resourceIds)
+		{
+			ResourceView resource = newstate.getResourceNode(id);
+			if(resource.getType() == ResourceNode.Type.GOLD_MINE)
+			{
+				goldAction.addResource(id, Math.max(Math.abs(resource.getXPosition()-spaces[0]), Math.abs(resource.getYPosition()-spaces[1])));
+			}
+			else
+			{
+				woodAction.addResource(id, Math.max(Math.abs(resource.getXPosition()-spaces[0]), Math.abs(resource.getYPosition()-spaces[1])));
+			}
+		}
 
 		// increment the number of steps;
 		return convertPlan2Actions(newstate);
@@ -85,6 +112,9 @@ public class ResourceCollectionAgent extends Agent {
 	@Override
 	public Map<Integer, Action> middleStep(StateView newstate,
 			HistoryView statehistory) {
+		System.out.println("In middleStep");
+		System.out.println("# of actions in plan: " + plan.size());
+		System.out.println("\n");
 		if(newstate.getTurnNumber() % replanTime == 0)
 		{
 			plan = SRS.getPlan(newstate, statehistory, goal);
@@ -119,42 +149,29 @@ public class ResourceCollectionAgent extends Agent {
 	{
 		System.out.println("In convertPlan2Actions");
 		Map<Integer, Action> actionMap = new HashMap<Integer, Action>();
-		// for each piece get the list of actions
-		for(Integer i : plan.keySet())
-		{
-			// if this list's action is still being executed then
-			// don't tell the peasants to do anything else
-			if(inProgress.containsKey(i))
-			{
-				System.out.println("List " + i + " is in progress");
-				continue;
-			}
-			
 
-			List<BaseAction> actions = plan.get(i);
-			// if there are actions and the preconditions are satisfied
-			if(actions.size() > 0 && preSat(actions.get(0), state))
+		while(!plan.isEmpty())
+		{
+			System.out.println("Action " + plan.get(0).getClass().getName());
+			System.out.println("\tPreconditions Met: " + preSat(plan.get(0), state));
+			if(preSat(plan.get(0), state))
 			{
-				
-				System.out.println("List " + i + "'s action has the preconditions satisfied");
-				// integer 0 will always be the townhall's actions
-				if(i == 0)
+				System.out.println("\tUnit Type: " + plan.get(0).getUnitType());
+				if(plan.get(0).getUnitType().equals("Peasant"))
 				{
-					System.out.println("This is a townhall action");
-					actions.get(0).setPeasant(townhall);
-					actionMap.put(townhall, actions.get(0).getAction());
-				}
-				else // this is a peasant list
-				{
-					System.out.println("This is a peasant action");
 					Integer id = getAvailPeasant();
-					if(id != null) // if there are available peasants
-					{
-						// have them do the action
-						actions.get(0).setPeasant(id);
-						actionMap.put(id, actions.get(0).getAction());
-					}
+					actionMap.put(id, plan.remove(0).getAction(playernum, id, state));
+					System.out.println("actionMap: " + actionMap);
 				}
+				else
+				{
+					actionMap.put(townhall, plan.remove(0).getAction(playernum, townhall, state));
+					System.out.println("actionMap: " + actionMap);
+				}
+			}
+			else // as soon as a single bad action is reached then quit trying to make a plan
+			{
+				break;
 			}
 		}
 		return actionMap;
