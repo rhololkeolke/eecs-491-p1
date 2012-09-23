@@ -14,4 +14,12 @@ public class Scheduler {
 	{
 		
 	}
+	
+	public static List<List<BaseAction>> schedulePlan(List<BaseAction> actions)
+	{
+		for(int x = 1; x < actions.size(); x++)
+		{
+			
+		}
+	}
 }

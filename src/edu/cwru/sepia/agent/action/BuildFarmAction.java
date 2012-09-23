@@ -5,6 +5,9 @@ import edu.cwru.sepia.agent.Condition;
 
 public class BuildFarmAction implements BaseAction {
 	
+	private int startTime;
+	private int endTime;
+	
 	private final static Condition pre = new Condition(500,250,1,0);
 	private final static Condition post = new Condition(0,0,1,4);
 
@@ -40,5 +43,28 @@ public class BuildFarmAction implements BaseAction {
 		else
 			throw new Exception("Duration out of bounds!!");
 	}
-
+	
+	@Override
+	public int getStartTime()
+	{
+		return startTime;
+	}
+	
+	@Override
+	public int getEndTime()
+	{
+		return endTime;
+	}
+	
+	@Override
+	public void setStartTime(int time)
+	{
+		startTime = time;
+	}
+	
+	@Override
+	public void setEndTime(int time)
+	{
+		endTime = time;
+	}
 }

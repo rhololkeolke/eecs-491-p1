@@ -14,5 +14,13 @@ public interface BaseAction {
 	public void updateDuration(int duration) throws Exception;
 	
 	public Action getAction();
+	
+	public int getStartTime();
+	
+	public int getEndTime();
+	
+	public void setStartTime(int time);
+	
+	public void setEndTime(int time);
 
 }
