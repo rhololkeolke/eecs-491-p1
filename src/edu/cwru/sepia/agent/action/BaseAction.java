@@ -14,5 +14,8 @@ public interface BaseAction {
 	public void updateDuration(int duration) throws Exception;
 	
 	public Action getAction();
-
+	
+	public void setPeasant(Integer i);
+	
+	public Integer getPeasant();
 }

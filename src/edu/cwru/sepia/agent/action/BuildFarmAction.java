@@ -12,6 +12,9 @@ public class BuildFarmAction implements BaseAction {
 	// more reasonable estimate
 	private static int duration = 10;
 	
+	// used to keep track of which peasant is executing this action
+	private Integer peasant = null;
+	
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -39,6 +42,16 @@ public class BuildFarmAction implements BaseAction {
 			BuildFarmAction.duration = duration;
 		else
 			throw new Exception("Duration out of bounds!!");
+	}
+
+	@Override
+	public void setPeasant(Integer i) {
+		peasant = i;
+	}
+	
+	@Override
+	public Integer getPeasant(){
+		return peasant;
 	}
 
 }

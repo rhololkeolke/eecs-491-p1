@@ -12,6 +12,8 @@ public final class BuildPeasantAction implements BaseAction {
 	// more reasonable estimate
 	private static int duration = 10;
 	
+	private Integer peasant = null;
+	
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -39,6 +41,16 @@ public final class BuildPeasantAction implements BaseAction {
 			BuildPeasantAction.duration = duration;
 		else
 			throw new Exception("Duration out of bounds!!");
+	}
+	
+	@Override
+	public void setPeasant(Integer i) {
+		peasant = i;
+	}
+	
+	@Override
+	public Integer getPeasant(){
+		return peasant;
 	}
 
 }
