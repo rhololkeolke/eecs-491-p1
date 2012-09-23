@@ -14,5 +14,7 @@ public interface BaseAction {
 	public void updateDuration(int duration) throws Exception;
 	
 	public Action getAction();
+	
+	public String getUnitType();
 
 }

@@ -10,8 +10,8 @@ public final class BuildPeasantAction implements BaseAction {
 	
 	// set to a default value, but this should probably be changed to a 
 	// more reasonable estimate
-	private static int duration = 10;
-	
+	private static int duration = 1;
+		
 	@Override
 	public Condition getPreConditions() {
 		return pre;
@@ -39,6 +39,11 @@ public final class BuildPeasantAction implements BaseAction {
 			BuildPeasantAction.duration = duration;
 		else
 			throw new Exception("Duration out of bounds!!");
+	}
+
+	@Override
+	public String getUnitType() {
+		return "TownHall";
 	}
 
 }
