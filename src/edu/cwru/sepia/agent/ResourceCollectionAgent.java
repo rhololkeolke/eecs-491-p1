@@ -13,10 +13,12 @@ import edu.cwru.sepia.action.ActionFeedback;
 import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.agent.action.BaseAction;
+import edu.cwru.sepia.agent.action.CollectAction;
 import edu.cwru.sepia.agent.action.CollectGoldAction;
 import edu.cwru.sepia.agent.action.CollectWoodAction;
 import edu.cwru.sepia.environment.model.history.BirthLog;
 import edu.cwru.sepia.environment.model.history.History.HistoryView;
+import edu.cwru.sepia.environment.model.history.ResourceNodeExhaustionLog;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
@@ -130,18 +132,26 @@ public class ResourceCollectionAgent extends Agent {
 		Map<Integer, ActionResult> commandLog = statehistory.getCommandFeedback(playernum, newstate.getTurnNumber()-1);
 		System.out.println("commandLog: " + commandLog);
 
+		// remove nodes that no longer have any resources
+		List<ResourceNodeExhaustionLog> depletedNodes = statehistory.getResourceNodeExhaustionLogs(newstate.getTurnNumber()-1);
+		updateResources(depletedNodes);
 		
+		// update the duration counts
+		// also if any compoundgather moves have completed add
+		// appropriate compound deposit actions
 		Map<Integer, Action> executableActions = updateDurations(commandLog);
 		
+		// see if any new peasants were created
+		// if they were then add their id's to the free peasant list
 		List<BirthLog> births = statehistory.getBirthLogs(newstate.getTurnNumber()-1);
-		System.out.println("births: " + births);
+		//System.out.println("births: " + births);
 		System.out.println("");
 		System.out.println("");
 		addNewPeasants(births);
 		
 		executableActions = convertPlan2Actions(newstate, executableActions);
 		
-		System.out.println("executableActions: " + executableActions);
+		//System.out.println("executableActions: " + executableActions);
 		return executableActions;
 	}
 
@@ -288,6 +298,28 @@ public class ResourceCollectionAgent extends Agent {
 		for(BirthLog log : births)
 		{
 			freePeasants.add(log.getNewUnitID());
+		}
+	}
+	
+	/*
+	 * This method removes depleted trees and gold mines from the duration
+	 * tracking map inside of the wood and gold action classes
+	 */
+	private void updateResources(List<ResourceNodeExhaustionLog> log)
+	{
+		CollectAction wood = new CollectWoodAction();
+		CollectAction gold = new CollectGoldAction();
+		
+		for(ResourceNodeExhaustionLog nodeLog : log)
+		{
+			if(nodeLog.getResourceNodeType() == ResourceNode.Type.GOLD_MINE)
+			{
+				gold.deleteResource(nodeLog.getExhaustedNodeID());
+			}
+			else
+			{
+				wood.deleteResource(nodeLog.getExhaustedNodeID());
+			}
 		}
 	}
 }
