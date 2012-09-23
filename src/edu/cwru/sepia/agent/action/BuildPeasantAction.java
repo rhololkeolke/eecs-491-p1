@@ -5,6 +5,9 @@ import edu.cwru.sepia.agent.Condition;
 
 public final class BuildPeasantAction implements BaseAction {
 	
+	private int startTime;
+	private int endTime;
+	
 	private final static Condition pre = new Condition(400,0,0,1);
 	private final static Condition post = new Condition(0,0,1,0);
 	
@@ -43,8 +46,30 @@ public final class BuildPeasantAction implements BaseAction {
 	}
 
 	@Override
+	public int getStartTime()
+	{
+		return startTime;
+	}
+	
+	@Override
+	public int getEndTime()
+	{
+		return endTime;
+	}
+	
+	@Override
+	public void setStartTime(int time)
+	{
+		startTime = time;
+	}
+	
+	@Override
+	public void setEndTime(int time)
+	{
+		endTime = time;
+	}	
+
 	public String getUnitType() {
 		return "TownHall";
 	}
-
 }

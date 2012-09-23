@@ -5,6 +5,9 @@ import edu.cwru.sepia.agent.Condition;
 
 public final class CollectWoodAction implements BaseAction {
 
+	private int startTime;
+	private int endTime;
+	
 	private final static Condition pre = new Condition(0,0,1,0);
 	private final static Condition post = new Condition(0,100,1,0);
 	
@@ -46,4 +49,27 @@ public final class CollectWoodAction implements BaseAction {
 		return "Peasant";
 	}
 	
+	@Override
+	public int getStartTime()
+	{
+		return startTime;
+	}
+	
+	@Override
+	public int getEndTime()
+	{
+		return endTime;
+	}
+	
+	@Override
+	public void setStartTime(int time)
+	{
+		startTime = time;
+	}
+	
+	@Override
+	public void setEndTime(int time)
+	{
+		endTime = time;
+	}
 }
