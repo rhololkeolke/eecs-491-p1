@@ -235,6 +235,7 @@ public class ResourceCollectionAgent extends Agent {
 		result = result && (state.getResourceAmount(playernum, ResourceType.WOOD) >= pre.wood); // is there enough wood?
 		result = result && (freePeasants.size() >= pre.peasant); // are there enough peasants?
 		// might have to subtract the number of peasants currently created
+		int sup = state.getSupplyCap(playernum);
 		result = result && (state.getSupplyCap(playernum) >= pre.supply); // are there enough farms?
 		if(pre.townhall == 1)
 			result = result && !busyTownhall;

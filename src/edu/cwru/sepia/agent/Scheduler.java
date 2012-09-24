@@ -16,6 +16,10 @@ public class Scheduler {
 	
 	public static void schedulePlan(List<BaseAction> actions, Condition start)
 	{
+		if (actions.isEmpty())
+		{
+			return;
+		}
 		List<Integer> decisionTimes = new LinkedList<Integer>();
 		decisionTimes.add(0);
 		decisionTimes.add(actions.get(0).getEndTime());

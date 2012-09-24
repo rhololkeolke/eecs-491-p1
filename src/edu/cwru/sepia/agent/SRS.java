@@ -110,7 +110,7 @@ public final class SRS {
 			}
 			else if (unit.getTemplateView().getName().equalsIgnoreCase("townhall"))
 			{
-				current.supply += 1;
+				current.supply += 3;
 			}
 			else if (unit.getTemplateView().getName().equalsIgnoreCase("farm"))
 			{
