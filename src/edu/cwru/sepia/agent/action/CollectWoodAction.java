@@ -7,7 +7,7 @@ import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.Condition;
 import edu.cwru.sepia.environment.model.state.State.StateView;
 
-public final class CollectWoodAction implements BaseAction, CollectAction {
+public class CollectWoodAction implements BaseAction, CollectAction {
 
 	private int startTime;
 	private int endTime;
@@ -87,9 +87,9 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 	@Override
 	public void addResource(int resourceId, int distance) {
 		durations.put(resourceId, 2*distance);
-		if(shortestDuration == null || 2*distance < shortestDuration)
+		if(shortestDuration == null || 2*distance*16 + 1000 < shortestDuration)
 		{
-			shortestDuration = 2*distance;
+			shortestDuration = 2*distance*16 + 1000;
 			shortestID = resourceId;
 		}
 	}
@@ -125,5 +125,11 @@ public final class CollectWoodAction implements BaseAction, CollectAction {
 	@Override
 	public String toString(){
 		return "Collect Wood with " + unitid;
+	}
+	
+	@Override
+	public int compareTo(BaseAction act) 
+	{
+		return this.getStartTime() - act.getStartTime();
 	}
 }

@@ -96,4 +96,10 @@ public class BuildFarmAction implements BaseAction {
 	public int getUnitId() {
 		return unitid;
 	}
+	
+	@Override
+	public int compareTo(BaseAction act) 
+	{
+		return this.getStartTime() - act.getStartTime();
+	}
 }

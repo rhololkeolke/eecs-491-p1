@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionFeedback;
@@ -23,6 +24,8 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State.StateView;
+import edu.cwru.sepia.experiment.Configuration;
+import edu.cwru.sepia.experiment.ConfigurationValues;
 
 /*
  * This agent uses an instance of the SRS class to do online planning for 
@@ -57,12 +60,6 @@ public class ResourceCollectionAgent extends Agent {
 	public ResourceCollectionAgent(int playernum) {
 		super(playernum);
 		
-		// Extract the Goal conditions from the xml
-		//Preferences prefs = Preferences.userRoot().node("edu").node("cwru").node("sepia").node("ModelParameters");
-		goal = new Condition();
-		goal.gold=1000;
-		goal.wood=1000;
-		
 		// this will be used by the convertId's method
 		inProgress = new ArrayList<Pair<BaseAction, Integer>>();
 		
@@ -72,8 +69,17 @@ public class ResourceCollectionAgent extends Agent {
 	@Override
 	public Map<Integer, Action> initialStep(StateView newstate,
 			HistoryView statehistory) {
+		
 		System.out.println("In initial step");
 		
+		// Extract the Goal conditions from the xml
+		
+		goal = new Condition();
+		//goal.gold=ConfigurationValues.MODEL_REQUIRED_GOLD.getIntValue(configuration);
+		//goal.wood=Preferences.userRoot().node("edu").node("cwru").node("sepia").node("environment").node("model").getInt("RequiredWood", 0);
+
+		goal.gold = 1000;
+		goal.wood = 1000;
 		// find out the townhall and add all of the peasants to the free list
 		List<Integer> unitIds = newstate.getUnitIds(this.playernum);
 		for(Integer id : unitIds)

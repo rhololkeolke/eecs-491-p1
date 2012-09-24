@@ -90,4 +90,10 @@ public final class BuildPeasantAction implements BaseAction {
 	public String toString(){
 		return "Build a Peasant with " + unitid;
 	}
+
+	@Override
+	public int compareTo(BaseAction act) 
+	{
+		return this.getStartTime() - act.getStartTime();
+	}
 }

@@ -45,6 +45,7 @@ public class MEA
 				int needs = (int) Math.ceil((goal.gold - current.gold)/100);
 				for (int x = 0; x < needs; x++)
 				{
+					act = new CollectGoldAction();
 					if (actions.size() == 0)
 					{
 						act.setStartTime(0);
@@ -76,6 +77,7 @@ public class MEA
 				int needs = (int) Math.ceil((goal.wood - current.wood)/100);
 				for (int x = 0; x < needs; x++)
 				{
+					act = new CollectWoodAction();
 					if (actions.size() == 0)
 					{
 						act.setStartTime(0);
@@ -107,6 +109,7 @@ public class MEA
 				int needs = goal.peasant - current.peasant;
 				for (int x = 0; x < needs; x++)
 				{
+					act = new BuildPeasantAction();
 					if (actions.size() == 0)
 					{
 						act.setStartTime(0);
@@ -138,6 +141,7 @@ public class MEA
 				int needs = (int) Math.ceil((goal.supply - current.supply)/4);
 				for (int x = 0; x < needs; x++)
 				{
+					act = new BuildFarmAction();
 					if (actions.size() == 0)
 					{
 						act.setStartTime(0);

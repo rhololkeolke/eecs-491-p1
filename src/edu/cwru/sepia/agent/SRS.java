@@ -1,5 +1,6 @@
 package edu.cwru.sepia.agent;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,16 +47,23 @@ public final class SRS {
 		end.peasant=start.peasant+1;
 		List<BaseAction> peasantPlan = MEA.plan(start, end);
 		Scheduler.schedulePlan(peasantPlan, start);
+		Collections.sort(peasantPlan);
+		Scheduler.schedulePlan(peasantPlan, start);
 		
 		int baseTime = planTime(basePlan);
 		int peasantTime = planTime(peasantPlan);
 		
+		Collections.sort(basePlan);
+		Collections.sort(peasantPlan);
+		
 		if (baseTime < peasantTime)
 		{
+			Collections.sort(basePlan);
 			return basePlan;
 		}
 		else
 		{
+			Collections.sort(peasantPlan);
 			return peasantPlan;
 		}
 		/*

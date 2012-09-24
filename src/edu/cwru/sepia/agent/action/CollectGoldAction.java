@@ -7,7 +7,7 @@ import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.agent.Condition;
 import edu.cwru.sepia.environment.model.state.State.StateView;
 
-public final class CollectGoldAction implements BaseAction, CollectAction {
+public class CollectGoldAction implements BaseAction, CollectAction {
 
 	private int startTime;
 	private int endTime;
@@ -86,9 +86,9 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 	@Override
 	public void addResource(int resourceId, int distance) {
 		durations.put(resourceId, 2*distance);
-		if(shortestDuration == null || 2*distance < shortestDuration)
+		if(shortestDuration == null || 2*distance*16 + 200 < shortestDuration)
 		{
-			shortestDuration = 2*distance;
+			shortestDuration = 2*distance*16 + 200;
 			shortestID = resourceId;
 		}
 	}
@@ -124,5 +124,11 @@ public final class CollectGoldAction implements BaseAction, CollectAction {
 	@Override
 	public String toString(){
 		return "Collect Gold with " + unitid;
+	}
+	
+	@Override
+	public int compareTo(BaseAction act) 
+	{
+		return this.getStartTime() - act.getStartTime();
 	}
 }
