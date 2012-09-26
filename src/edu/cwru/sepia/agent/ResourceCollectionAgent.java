@@ -78,8 +78,8 @@ public class ResourceCollectionAgent extends Agent {
 		//goal.gold=ConfigurationValues.MODEL_REQUIRED_GOLD.getIntValue(configuration);
 		//goal.wood=Preferences.userRoot().node("edu").node("cwru").node("sepia").node("environment").node("model").getInt("RequiredWood", 0);
 
-		goal.gold = 1000;
-		goal.wood = 1000;
+		goal.gold = 50000;
+		goal.wood = 50000;
 		// find out the townhall and add all of the peasants to the free list
 		List<Integer> unitIds = newstate.getUnitIds(this.playernum);
 		for(Integer id : unitIds)
@@ -151,7 +151,8 @@ public class ResourceCollectionAgent extends Agent {
 		// see if any new peasants were created
 		// if they were then add their id's to the free peasant list
 		List<BirthLog> births = statehistory.getBirthLogs(newstate.getTurnNumber()-1);
-		//System.out.println("births: " + births);
+		if(!births.isEmpty())
+			System.out.println("births: " + births);
 		System.out.println("");
 		System.out.println("");
 		addNewPeasants(births);
@@ -191,9 +192,10 @@ public class ResourceCollectionAgent extends Agent {
 		while(!plan.isEmpty())
 		{
 			System.out.println("Action " + plan.get(0).getClass().getName());
-			System.out.println("\tPreconditions Met: " + preSat(plan.get(0), state));
+			//System.out.println("\tPreconditions Met: " + preSat(plan.get(0), state));
 			if(preSat(plan.get(0), state))
 			{
+				System.out.println("\tPreconditions Met: True");
 				System.out.println("\tUnit Type: " + plan.get(0).getUnitType());
 				if(plan.get(0).getUnitType().equals("Peasant"))
 				{
@@ -295,13 +297,28 @@ public class ResourceCollectionAgent extends Agent {
 				else
 					busyTownhall = false;
 			}
+			// error or something else
+			else
+			{
+				// retry the action
+				// should probably make this replan
+				/*Action oldAction = log.get(unitid).getAction();
+				ActionType oldType = oldAction.getType();
+				switch(oldType)
+				{
+				case COMPOUNDGATHER:
+					actionMap.put(unitid, Action.createCompoundGather(unitid, ))
+				}*/
+				actionMap.put(unitid, log.get(unitid).getAction());
+				newInProgress.add(pairing);
+			}
 		}
 		inProgress = newInProgress;
 		return actionMap;
 	}
 	
 	private void addNewPeasants(List<BirthLog> births)
-	{
+	{	
 		for(BirthLog log : births)
 		{
 			freePeasants.add(log.getNewUnitID());
