@@ -302,15 +302,22 @@ public class ResourceCollectionAgent extends Agent {
 			{
 				// retry the action
 				// should probably make this replan
-				/*Action oldAction = log.get(unitid).getAction();
-				ActionType oldType = oldAction.getType();
-				switch(oldType)
+				// deposits must suceed or a peasant becomes useless
+				// because the peasant will be unable to pickup any more resources without first depositing
+				if(log.get(unitid).getAction().getType().compareTo(ActionType.COMPOUNDDEPOSIT) == 0)
 				{
-				case COMPOUNDGATHER:
-					actionMap.put(unitid, Action.createCompoundGather(unitid, ))
-				}*/
-				actionMap.put(unitid, log.get(unitid).getAction());
-				newInProgress.add(pairing);
+					actionMap.put(unitid, log.get(unitid).getAction());
+					newInProgress.add(pairing);
+				}
+				// any other action can simply be dropped and will be readded with the new plan
+				else
+				{
+					Pair<BaseAction, Integer> completed = inProgress.get(index);
+					if(unitid != townhall)
+						freePeasants.add(unitid);
+					else
+						busyTownhall = false;
+				}
 			}
 		}
 		inProgress = newInProgress;
