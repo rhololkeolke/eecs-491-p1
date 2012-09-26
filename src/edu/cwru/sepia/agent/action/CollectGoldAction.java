@@ -1,11 +1,19 @@
 package edu.cwru.sepia.agent.action;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionType;
+import edu.cwru.sepia.action.DirectedAction;
+import edu.cwru.sepia.action.TargetedAction;
 import edu.cwru.sepia.agent.Condition;
+import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.State.StateView;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
+import edu.cwru.sepia.util.Direction;
 
 public class CollectGoldAction implements BaseAction, CollectAction {
 
@@ -39,8 +47,95 @@ public class CollectGoldAction implements BaseAction, CollectAction {
 	}
 	
 	@Override
-	public Action getAction(int playernum, StateView state) {
-		return Action.createCompoundGather(unitid, shortestID);
+	public Action getAction(int playernum, StateView state) 
+	{
+		int shortID = shortestID;
+		while(true)
+		{
+			int peasants = numUnitsCollecting(playernum, state, shortID);
+			if (peasants < 5)
+			{
+				break;
+			}
+			else
+			{
+				int ID = getNextShortest(durations.get(shortID));
+				if (ID == -1)
+				{
+					break;
+				}
+				shortID = ID;
+			}
+		}
+		return Action.createCompoundGather(unitid, shortID);
+	}
+	
+	private int numUnitsCollecting(int playerNum, StateView state, int resourceID)
+	{
+		int peasants = 0;
+		List<UnitView> units = state.getUnits(playerNum);
+		for (UnitView unit: units)
+		{
+			if (unit.getTemplateView().getName().equalsIgnoreCase("peasant"))
+			{
+				Action act = unit.getCurrentDurativeAction();
+				if (act != null)
+				{
+					if (act.getType() == ActionType.COMPOUNDGATHER)
+					{
+						TargetedAction targetAct = (TargetedAction) act;
+						if (targetAct.getTargetId() == resourceID)
+						{
+							peasants++;
+						}
+					}
+					else if (act.getType() == ActionType.PRIMITIVEGATHER)
+					{
+						DirectedAction dAct = (DirectedAction) act;
+						if (resourceMatchAt(unit, dAct.getDirection(), resourceID, state))
+						{
+							peasants++;
+						}
+					}
+				}
+			}
+		}
+		
+		return peasants;
+	}
+	
+	private boolean resourceMatchAt(UnitView unit, Direction dir, int resourceID, StateView state)
+	{
+		int targetX = unit.getXPosition() + dir.xComponent();
+		int targetY = unit.getYPosition() + dir.yComponent();
+		
+		ResourceView res = state.getResourceNode(resourceID);
+		if (res.getXPosition() == targetX && res.getYPosition() == targetY)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	private int getNextShortest(int time)
+	{
+		int shortest = 999999;
+		int shortestID = -1;
+		Set<Integer> keys = durations.keySet();
+		for (Integer key:keys)
+		{
+			if (durations.get(key) < shortest && durations.get(key) > time)
+			{
+				shortest = durations.get(key);
+				shortestID = key;
+			}
+		}
+		
+		return shortestID;
 	}
 
 	@Override
@@ -85,7 +180,7 @@ public class CollectGoldAction implements BaseAction, CollectAction {
 
 	@Override
 	public void addResource(int resourceId, int distance) {
-		durations.put(resourceId, 2*distance);
+		durations.put(resourceId, 2*distance*16 + 200);
 		if(shortestDuration == null || 2*distance*16 + 200 < shortestDuration)
 		{
 			shortestDuration = 2*distance*16 + 200;

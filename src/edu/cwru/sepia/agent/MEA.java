@@ -32,7 +32,7 @@ public class MEA
 			Condition pre = act.getPreConditions();
 			Condition post = act.getPostConditions();
 			
-			int needs = (int) Math.ceil((goal.gold - current.gold)/100);
+			int needs = (int) Math.ceil((goal.gold - current.gold)/100.0);
 			for (int x = 0; x < needs; x++)
 			{
 				act = new CollectGoldAction();
@@ -65,7 +65,7 @@ public class MEA
 			Condition pre = act.getPreConditions();
 			Condition post = act.getPostConditions();
 			
-			int needs = (int) Math.ceil((goal.wood - current.wood)/100);
+			int needs = (int) Math.ceil((goal.wood - current.wood)/100.0);
 			for (int x = 0; x < needs; x++)
 			{
 				act = new CollectWoodAction();
