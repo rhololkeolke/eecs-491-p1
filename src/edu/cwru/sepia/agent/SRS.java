@@ -41,13 +41,21 @@ public final class SRS {
 		end.wood = goal.wood;
 		
 		Condition start = getCurrentCondition(state, playerNum);
-		List<BaseAction> basePlan = MEA.plan(start, end);
+		List<BaseAction> basePlan = MEA.plan(start, end).first;
 		Scheduler.schedulePlan(basePlan, start);
 		
+		Condition intermediate = new Condition();
+		intermediate.peasant = start.peasant + 1;
+		Pair<List<BaseAction>,Condition> pair = MEA.plan(start, intermediate);
+		List<BaseAction> intermediatePlan = pair.first;
+		Condition afterIntermediate = pair.second;
+		Scheduler.schedulePlan(intermediatePlan, start);
+		
 		end.peasant=start.peasant+1;
-		List<BaseAction> peasantPlan = MEA.plan(start, end);
-		Scheduler.schedulePlan(peasantPlan, start);
-		Collections.sort(peasantPlan);
+		List<BaseAction> afterIntermediatePlan = MEA.plan(afterIntermediate, end).first;
+		Scheduler.schedulePlan(afterIntermediatePlan, afterIntermediate);
+		
+		List<BaseAction> peasantPlan = concat(intermediatePlan, afterIntermediatePlan);
 		Scheduler.schedulePlan(peasantPlan, start);
 		
 		int baseTime = planTime(basePlan);
@@ -87,6 +95,7 @@ public final class SRS {
 			if (unit.getTemplateView().getName().equalsIgnoreCase("peasant"))
 			{
 				current.peasant += 1;
+				current.supply -= 1;
 				Action act = unit.getCurrentDurativeAction();
 				if (act != null)
 				{
@@ -132,5 +141,19 @@ public final class SRS {
 			}
 		}
 		return time;
+	}
+	
+	private static List<BaseAction> concat(List<BaseAction> plan1, List<BaseAction> plan2)
+	{
+		int endTime = plan1.get(plan1.size()-1).getEndTime();
+		
+		for (BaseAction act : plan2)
+		{
+			act.setStartTime(act.getStartTime()+endTime);
+			act.setEndTime(act.getEndTime()+endTime);
+			plan1.add(act);
+		}
+		
+		return plan1;
 	}
 }

@@ -79,7 +79,7 @@ public class BuildFarmAction implements BaseAction {
 
 	@Override
 	public String getUnitType() {
-		return "TownHall";
+		return "Peasant";
 	}
 	
 	@Override
