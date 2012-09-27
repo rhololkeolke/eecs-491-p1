@@ -40,7 +40,7 @@ public class ResourceCollectionAgent extends Agent {
 	private List<BaseAction> plan = null;
 	
 	// this number controls how often the agent will replan
-	private int replanTime = 1000;
+	private int replanTime = 200;
 	
 	private Condition goal;
 	

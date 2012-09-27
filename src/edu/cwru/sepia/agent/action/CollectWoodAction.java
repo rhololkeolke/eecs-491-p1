@@ -63,7 +63,7 @@ public class CollectWoodAction implements BaseAction, CollectAction {
 				int ID = getNextShortest(durations.get(shortID));
 				if (ID == -1)
 				{
-					break;
+					return Action.createCompoundMove(unitid, (int)Math.random()*state.getXExtent(), (int)Math.random()*state.getYExtent());
 				}
 				shortID = ID;
 			}

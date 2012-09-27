@@ -6,6 +6,7 @@ import java.util.List;
 
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionType;
+import edu.cwru.sepia.action.DirectedAction;
 import edu.cwru.sepia.action.TargetedAction;
 import edu.cwru.sepia.agent.action.BaseAction;
 import edu.cwru.sepia.agent.action.CollectGoldAction;
@@ -107,6 +108,17 @@ public final class SRS {
 							current.gold += 100;
 						}
 						else if (state.getResourceNode(targetAct.getTargetId()).getType() == Type.TREE)
+						{
+							current.wood += 100;
+						}
+					}
+					else if(act.getType() == ActionType.COMPOUNDDEPOSIT)
+					{
+						if(unit.getCargoType() == ResourceType.GOLD)
+						{
+							current.gold += 100;
+						}
+						else
 						{
 							current.wood += 100;
 						}
