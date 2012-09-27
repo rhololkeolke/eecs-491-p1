@@ -158,7 +158,7 @@ public class ResourceCollectionAgent extends Agent {
 			System.out.println("births: " + births);
 		System.out.println("");
 		System.out.println("");
-		addNewPeasants(births);
+		addNewPeasants(births, newstate);
 		
 		executableActions = convertPlan2Actions(newstate, executableActions);
 		
@@ -328,11 +328,13 @@ public class ResourceCollectionAgent extends Agent {
 		return actionMap;
 	}
 	
-	private void addNewPeasants(List<BirthLog> births)
+	private void addNewPeasants(List<BirthLog> births, StateView state)
 	{	
 		for(BirthLog log : births)
 		{
-			freePeasants.add(log.getNewUnitID());
+			String unitName = state.getUnit(log.getNewUnitID()).getTemplateView().getName();
+			if(unitName.equals("Peasant"))
+				freePeasants.add(log.getNewUnitID());
 		}
 	}
 	
