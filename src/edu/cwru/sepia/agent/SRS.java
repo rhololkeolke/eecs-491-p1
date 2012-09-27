@@ -111,7 +111,7 @@ public final class SRS {
 							current.wood += 100;
 						}
 					}
-					else if (act.getType() == ActionType.COMPOUNDBUILD)
+					else if (act.getType() == ActionType.COMPOUNDBUILD || act.getType() == ActionType.PRIMITIVEBUILD)
 					{
 						current.supply += 4;
 					}
