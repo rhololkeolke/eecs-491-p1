@@ -29,6 +29,8 @@ public class CollectWoodAction implements BaseAction, CollectAction {
 	private static Integer shortestDuration = null;
 	private static Integer shortestID = null;
 	
+	private static Map<Integer, Integer> tempGather = new HashMap<Integer, Integer>();
+	
 	private int unitid;
 
 	@Override
@@ -67,7 +69,19 @@ public class CollectWoodAction implements BaseAction, CollectAction {
 			}
 		}
 		
+		Integer num = tempGather.get(shortID);
+		int count = 1;
+		if (num != null)
+		{
+			count = num+1;
+		}
+		tempGather.put(shortID, count);
 		return Action.createCompoundGather(unitid, shortID);
+	}
+	
+	public static void clearTempGather()
+	{
+		tempGather.clear();
 	}
 	
 	private int numUnitsCollecting(int playerNum, StateView state, int resourceID)
@@ -101,7 +115,13 @@ public class CollectWoodAction implements BaseAction, CollectAction {
 			}
 		}
 		
-		return peasants;
+		Integer num = tempGather.get(resourceID);
+		int count = 0;
+		if (num != null)
+		{
+			count = num;
+		}
+		return peasants + count;
 	}
 	
 	private boolean resourceMatchAt(UnitView unit, Direction dir, int resourceID, StateView state)

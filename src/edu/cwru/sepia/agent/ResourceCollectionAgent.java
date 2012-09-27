@@ -40,7 +40,7 @@ public class ResourceCollectionAgent extends Agent {
 	private List<BaseAction> plan = null;
 	
 	// this number controls how often the agent will replan
-	private int replanTime = 400;
+	private int replanTime = 1000;
 	
 	private Condition goal;
 	
@@ -128,6 +128,9 @@ public class ResourceCollectionAgent extends Agent {
 	@Override
 	public Map<Integer, Action> middleStep(StateView newstate,
 			HistoryView statehistory) {
+		CollectGoldAction.clearTempGather();
+		CollectWoodAction.clearTempGather();
+		
 		System.out.println("In middleStep");
 		System.out.println("# of actions in plan: " + plan.size());
 		System.out.println("\n");

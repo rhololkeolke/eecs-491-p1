@@ -28,6 +28,8 @@ public class CollectGoldAction implements BaseAction, CollectAction {
 	
 	private static Integer shortestDuration = null;
 	private static Integer shortestID = null;
+
+	private static Map<Integer, Integer> tempGather = new HashMap<Integer, Integer>();
 	
 	int unitid;
 	
@@ -70,6 +72,11 @@ public class CollectGoldAction implements BaseAction, CollectAction {
 		return Action.createCompoundGather(unitid, shortID);
 	}
 	
+	public static void clearTempGather()
+	{
+		tempGather.clear();
+	}
+	
 	private int numUnitsCollecting(int playerNum, StateView state, int resourceID)
 	{
 		int peasants = 0;
@@ -101,7 +108,14 @@ public class CollectGoldAction implements BaseAction, CollectAction {
 			}
 		}
 		
-		return peasants;
+		Integer num = tempGather.get(resourceID);
+		int count = 0;
+		if (num != null)
+		{
+			count = num;
+		}
+				
+		return peasants+count;
 	}
 	
 	private boolean resourceMatchAt(UnitView unit, Direction dir, int resourceID, StateView state)
