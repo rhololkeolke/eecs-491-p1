@@ -54,7 +54,7 @@ public class CollectWoodAction implements BaseAction, CollectAction {
 		while(true)
 		{
 			int peasants = numUnitsCollecting(playernum, state, shortID);
-			if (peasants < 5)
+			if (peasants < 4)
 			{
 				break;
 			}

@@ -11,10 +11,12 @@ import edu.cwru.sepia.action.TargetedAction;
 import edu.cwru.sepia.agent.action.BaseAction;
 import edu.cwru.sepia.agent.action.CollectGoldAction;
 import edu.cwru.sepia.environment.model.history.History.HistoryView;
+import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.ResourceNode.Type;
 import edu.cwru.sepia.environment.model.state.State.StateView;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
+import edu.cwru.sepia.util.Direction;
 
 /*
  * Calls the MEA with the original goal conditions 
@@ -42,7 +44,8 @@ public final class SRS {
 		end.wood = goal.wood;
 		
 		Condition start = getCurrentCondition(state, playerNum);
-		List<BaseAction> basePlan = MEA.plan(start, end).first;
+		Pair<List<BaseAction>, Condition>  basePair = MEA.plan(start, end);
+		List<BaseAction> basePlan = basePair.first;
 		Scheduler.schedulePlan(basePlan, start);
 		
 		Condition intermediate = new Condition();
@@ -59,8 +62,8 @@ public final class SRS {
 		List<BaseAction> peasantPlan = concat(intermediatePlan, afterIntermediatePlan);
 		Scheduler.schedulePlan(peasantPlan, start);
 		
-		int baseTime = planTime(basePlan);
-		int peasantTime = planTime(peasantPlan);
+		int baseTime = (int) (planTime(basePlan)*(1+0.2*(end.peasant-1)));
+		int peasantTime = (int) (planTime(peasantPlan)*(1+0.2*end.peasant));
 		
 		Collections.sort(basePlan);
 		Collections.sort(peasantPlan);
@@ -123,6 +126,19 @@ public final class SRS {
 							current.wood += 100;
 						}
 					}
+					else if(act.getType() == ActionType.PRIMITIVEGATHER)
+					{
+						DirectedAction dAct = (DirectedAction) act;
+						Type t = resourceAt(unit,dAct.getDirection(), state);
+						if (t == Type.GOLD_MINE)
+						{
+							current.gold += 100;
+						}
+						else if (t == Type.TREE)
+						{
+							current.wood += 100;
+						}
+					}
 					else if (act.getType() == ActionType.COMPOUNDBUILD || act.getType() == ActionType.PRIMITIVEBUILD)
 					{
 						current.supply += 4;
@@ -140,6 +156,33 @@ public final class SRS {
 				
 		}
 		return current;
+	}
+	
+	private static Type resourceAt(UnitView unit, Direction dir, StateView state)
+	{
+		int targetX = unit.getXPosition() + dir.xComponent();
+		int targetY = unit.getYPosition() + dir.yComponent();
+		
+		List<ResourceView> gold = state.getResourceNodes(Type.GOLD_MINE);
+		List<ResourceView> wood = state.getResourceNodes(Type.TREE);
+		
+		for (ResourceView g:gold)
+		{
+			if (g.getXPosition()==targetX && g.getYPosition()==targetY)
+			{
+				return Type.GOLD_MINE;
+			}
+		}
+		
+		for (ResourceView w:wood)
+		{
+			if (w.getXPosition()==targetX && w.getYPosition()==targetY)
+			{
+				return Type.TREE;
+			}
+		}
+		
+		return null;
 	}
 	
 	private static int planTime(List<BaseAction> plan)

@@ -25,71 +25,78 @@ public class MEA
 		current.supply = start.supply;
 		current.townhall = start.townhall;
 		current.wood = start.wood;
-		
-		if (current.gold < goal.gold)
+		while(current.gold < goal.gold || current.wood < goal.wood)
 		{
-			CollectGoldAction act = new CollectGoldAction();
-			Condition pre = act.getPreConditions();
-			Condition post = act.getPostConditions();
-			
-			int needs = (int) Math.ceil((goal.gold - current.gold)/100.0);
-			for (int x = 0; x < needs; x++)
+			for (int q = 0; q < 4; q++)
 			{
-				act = new CollectGoldAction();
-				if (actions.size() == 0)
+				if (current.gold < goal.gold)
 				{
-					act.setStartTime(0);
-					act.setEndTime(act.getDuration());
+					CollectGoldAction act = new CollectGoldAction();
+					Condition pre = act.getPreConditions();
+					Condition post = act.getPostConditions();
+					
+					//int needs = (int) Math.ceil((goal.gold - current.gold)/100.0);
+					int needs = 1;
+					for (int x = 0; x < needs; x++)
+					{
+						act = new CollectGoldAction();
+						if (actions.size() == 0)
+						{
+							act.setStartTime(0);
+							act.setEndTime(act.getDuration());
+						}
+						else
+						{
+							act.setStartTime(actions.get(actions.size()-1).getEndTime());
+							act.setEndTime(act.getStartTime() + act.getDuration());
+						}
+						current.gold -= pre.gold;
+						current.wood -= pre.wood;
+						current.peasant -= pre.peasant;
+						current.supply -= pre.supply;
+						current.townhall -= pre.townhall;
+						actions.add(act);
+						current.townhall += post.townhall;
+						current.gold += post.gold;
+						current.wood += post.wood;
+						current.peasant += post.peasant;
+						current.supply += post.supply;
+					}
 				}
-				else
-				{
-					act.setStartTime(actions.get(actions.size()-1).getEndTime());
-					act.setEndTime(act.getStartTime() + act.getDuration());
-				}
-				current.gold -= pre.gold;
-				current.wood -= pre.wood;
-				current.peasant -= pre.peasant;
-				current.supply -= pre.supply;
-				current.townhall -= pre.townhall;
-				actions.add(act);
-				current.townhall += post.townhall;
-				current.gold += post.gold;
-				current.wood += post.wood;
-				current.peasant += post.peasant;
-				current.supply += post.supply;
 			}
-		}
-		if (current.wood < goal.wood)
-		{
-			CollectWoodAction act = new CollectWoodAction();
-			Condition pre = act.getPreConditions();
-			Condition post = act.getPostConditions();
-			
-			int needs = (int) Math.ceil((goal.wood - current.wood)/100.0);
-			for (int x = 0; x < needs; x++)
+			if (current.wood < goal.wood)
 			{
-				act = new CollectWoodAction();
-				if (actions.size() == 0)
+				CollectWoodAction act = new CollectWoodAction();
+				Condition pre = act.getPreConditions();
+				Condition post = act.getPostConditions();
+				
+				//int needs = (int) Math.ceil((goal.wood - current.wood)/100.0);
+				int needs = 1;
+				for (int x = 0; x < needs; x++)
 				{
-					act.setStartTime(0);
-					act.setEndTime(act.getDuration());
+					act = new CollectWoodAction();
+					if (actions.size() == 0)
+					{
+						act.setStartTime(0);
+						act.setEndTime(act.getDuration());
+					}
+					else
+					{
+						act.setStartTime(actions.get(actions.size()-1).getEndTime());
+						act.setEndTime(act.getStartTime() + act.getDuration());
+					}
+					current.gold -= pre.gold;
+					current.wood -= pre.wood;
+					current.peasant -= pre.peasant;
+					current.supply -= pre.supply;
+					current.townhall -= pre.townhall;
+					actions.add(act);
+					current.townhall += post.townhall;
+					current.gold += post.gold;
+					current.wood += post.wood;
+					current.peasant += post.peasant;
+					current.supply += post.supply;
 				}
-				else
-				{
-					act.setStartTime(actions.get(actions.size()-1).getEndTime());
-					act.setEndTime(act.getStartTime() + act.getDuration());
-				}
-				current.gold -= pre.gold;
-				current.wood -= pre.wood;
-				current.peasant -= pre.peasant;
-				current.supply -= pre.supply;
-				current.townhall -= pre.townhall;
-				actions.add(act);
-				current.townhall += post.townhall;
-				current.gold += post.gold;
-				current.wood += post.wood;
-				current.peasant += post.peasant;
-				current.supply += post.supply;
 			}
 		}
 		if (current.supply < goal.supply)
