@@ -1,10 +1,8 @@
 package edu.cwru.sepia.agent.action;
 
 import edu.cwru.sepia.action.Action;
-import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.agent.Condition;
 import edu.cwru.sepia.environment.model.state.State.StateView;
-import edu.cwru.sepia.environment.model.state.Template.TemplateView;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
 public class BuildFarmAction implements BaseAction {

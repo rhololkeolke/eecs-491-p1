@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.prefs.Preferences;
-
 import edu.cwru.sepia.action.Action;
 import edu.cwru.sepia.action.ActionFeedback;
 import edu.cwru.sepia.action.ActionResult;
@@ -24,8 +22,6 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State.StateView;
-import edu.cwru.sepia.experiment.Configuration;
-import edu.cwru.sepia.experiment.ConfigurationValues;
 
 /*
  * This agent uses an instance of the SRS class to do online planning for 
@@ -57,29 +53,24 @@ public class ResourceCollectionAgent extends Agent {
 	// stores the peasants that are available for work
 	private List<Integer> freePeasants;
 
-	public ResourceCollectionAgent(int playernum) {
+	public ResourceCollectionAgent(int playernum, String[] params) {
 		super(playernum);
 		
 		// this will be used by the convertId's method
 		inProgress = new ArrayList<Pair<BaseAction, Integer>>();
 		
 		freePeasants = new LinkedList<Integer>();
+		
+		goal = new Condition();
+		goal.gold = Integer.parseInt(params[0]);
+		goal.wood = Integer.parseInt(params[1]);
+		
 	}
 
 	@Override
 	public Map<Integer, Action> initialStep(StateView newstate,
 			HistoryView statehistory) {
 		
-		//System.out.println("In initial step");
-		
-		// Extract the Goal conditions from the xml
-		
-		goal = new Condition();
-		//goal.gold=ConfigurationValues.MODEL_REQUIRED_GOLD.getIntValue(configuration);
-		//goal.wood=Preferences.userRoot().node("edu").node("cwru").node("sepia").node("environment").node("model").getInt("RequiredWood", 0);
-
-		goal.gold = 50000;
-		goal.wood = 50000;
 		// find out the townhall and add all of the peasants to the free list
 		List<Integer> unitIds = newstate.getUnitIds(this.playernum);
 		for(Integer id : unitIds)
@@ -121,7 +112,7 @@ public class ResourceCollectionAgent extends Agent {
 		
 		// increment the number of steps;
 		Map<Integer, Action> executableActions = convertPlan2Actions(newstate, new HashMap<Integer, Action>());
-		//System.out.println("executableActions: " + executableActions);
+
 		return executableActions;
 	}
 
@@ -130,8 +121,7 @@ public class ResourceCollectionAgent extends Agent {
 			HistoryView statehistory) {
 		CollectGoldAction.clearTempGather();
 		CollectWoodAction.clearTempGather();
-		
-		//System.out.println("In middleStep");
+
 		System.out.println("# of actions in plan: " + plan.size());
 		System.out.println("\n");
 		if(newstate.getTurnNumber() % replanTime == 0)
@@ -140,7 +130,6 @@ public class ResourceCollectionAgent extends Agent {
 		}
 
 		Map<Integer, ActionResult> commandLog = statehistory.getCommandFeedback(playernum, newstate.getTurnNumber()-1);
-		//System.out.println("commandLog: " + commandLog);
 
 		// remove nodes that no longer have any resources
 		List<ResourceNodeExhaustionLog> depletedNodes = statehistory.getResourceNodeExhaustionLogs(newstate.getTurnNumber()-1);
@@ -154,18 +143,20 @@ public class ResourceCollectionAgent extends Agent {
 		// see if any new peasants were created
 		// if they were then add their id's to the free peasant list
 		List<BirthLog> births = statehistory.getBirthLogs(newstate.getTurnNumber()-1);
-		if(!births.isEmpty())
-			//System.out.println("births: " + births);
-		//System.out.println("");
-		//System.out.println("");
+
 		addNewPeasants(births, newstate);
 		
 		executableActions = convertPlan2Actions(newstate, executableActions);
+		List<Integer> removePeasants = new LinkedList<Integer>();
 		for (Integer peasantID:freePeasants)
 		{
-			executableActions.put(peasantID, Action.createCompoundMove(peasantID, (int)Math.random()*newstate.getXExtent(), (int)Math.random()*newstate.getYExtent()));
+			executableActions.put(peasantID, Action.createCompoundMove(peasantID, (int)(Math.random()*newstate.getXExtent()), (int)(Math.random()*newstate.getYExtent())));
+			removePeasants.add(peasantID);
 		}
-		//System.out.println("executableActions: " + executableActions);
+		for (Integer peasantID:removePeasants)
+		{
+			freePeasants.remove(peasantID);
+		}
 		return executableActions;
 	}
 
@@ -197,12 +188,8 @@ public class ResourceCollectionAgent extends Agent {
 
 		while(!plan.isEmpty())
 		{
-			//System.out.println("Action " + plan.get(0).getClass().getName());
-			//System.out.println("\tPreconditions Met: " + preSat(plan.get(0), state));
 			if(preSat(plan.get(0), state))
 			{
-				//System.out.println("\tPreconditions Met: True");
-				//System.out.println("\tUnit Type: " + plan.get(0).getUnitType());
 				if(plan.get(0).getUnitType().equals("Peasant"))
 				{
 					// grab the id of the peasant this will be assigned to
@@ -215,7 +202,6 @@ public class ResourceCollectionAgent extends Agent {
 					actionMap.put(id, action.getAction(playernum, state));
 					// add the action to the list of actions in progress
 					inProgress.add(new Pair<BaseAction, Integer>(action, 0));
-					//System.out.println("actionMap: " + actionMap);
 				}
 				else
 				{
@@ -224,7 +210,6 @@ public class ResourceCollectionAgent extends Agent {
 					actionMap.put(townhall, action.getAction(playernum, state));
 					inProgress.add(new Pair<BaseAction, Integer>(action, 0));
 					busyTownhall = true;
-					//System.out.println("actionMap: " + actionMap);
 				}
 			}
 			else // as soon as a single bad action is reached then quit trying to make a plan
@@ -272,10 +257,6 @@ public class ResourceCollectionAgent extends Agent {
 			index++;
 			int unitid = pairing.first.getUnitId();
 			ActionResult ar = log.get(unitid);
-			/*if (ar == null)
-			{
-				continue;
-			}*/
 			ActionFeedback result = ar.getFeedback();
 			// if still in progress
 			if(result.compareTo(ActionFeedback.INCOMPLETE) == 0)

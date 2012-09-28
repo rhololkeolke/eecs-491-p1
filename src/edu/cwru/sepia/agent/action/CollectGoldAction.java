@@ -64,7 +64,7 @@ public class CollectGoldAction implements BaseAction, CollectAction {
 				int ID = getNextShortest(durations.get(shortID));
 				if (ID == -1)
 				{
-					return Action.createCompoundMove(unitid, (int)Math.random()*state.getXExtent(), (int)Math.random()*state.getYExtent());
+					return Action.createCompoundMove(unitid, (int)(Math.random()*state.getXExtent()), (int)(Math.random()*state.getYExtent()));
 				}
 				shortID = ID;
 			}

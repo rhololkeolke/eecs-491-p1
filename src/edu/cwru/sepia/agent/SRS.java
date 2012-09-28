@@ -1,7 +1,6 @@
 package edu.cwru.sepia.agent;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import edu.cwru.sepia.action.Action;
@@ -9,8 +8,6 @@ import edu.cwru.sepia.action.ActionType;
 import edu.cwru.sepia.action.DirectedAction;
 import edu.cwru.sepia.action.TargetedAction;
 import edu.cwru.sepia.agent.action.BaseAction;
-import edu.cwru.sepia.agent.action.CollectGoldAction;
-import edu.cwru.sepia.environment.model.history.History.HistoryView;
 import edu.cwru.sepia.environment.model.state.ResourceNode.ResourceView;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.ResourceNode.Type;
@@ -62,8 +59,8 @@ public final class SRS {
 		List<BaseAction> peasantPlan = concat(intermediatePlan, afterIntermediatePlan);
 		Scheduler.schedulePlan(peasantPlan, start);
 		
-		int baseTime = (int) (planTime(basePlan)*(1+0.2*(end.peasant-1)));
-		int peasantTime = (int) (planTime(peasantPlan)*(1+0.2*end.peasant));
+		int baseTime = (int) (planTime(basePlan)*(1+0.1*(end.peasant-1)));
+		int peasantTime = (int) (planTime(peasantPlan)*(1+0.1*end.peasant));
 		
 		Collections.sort(basePlan);
 		Collections.sort(peasantPlan);
@@ -78,11 +75,6 @@ public final class SRS {
 			Collections.sort(peasantPlan);
 			return peasantPlan;
 		}
-		/*
-		List<BaseAction> plan = new LinkedList<BaseAction>();
-		plan.add(new CollectGoldAction());
-		return plan;
-		*/
 	}
 
 	private static Condition getCurrentCondition(StateView state, int playerNum)
